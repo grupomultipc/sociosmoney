@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Utilidades para Socios - Quetzales</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px; /* Aumentar el ancho para la nueva columna */
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .currency-symbol {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 10px 10px 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .socio-inputs {
+            margin-top: 15px;
+        }
+        
+        .socio-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e1e1e1;
+        }
+        
+        .socio-input label {
+            flex: 0 0 150px;
+            margin-bottom: 0;
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4fc;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+            display: none;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: right; /* Alinear a la derecha para números */
+            border-bottom: 1px solid #ddd;
+        }
+
+        th:first-child, td:first-child {
+            text-align: left; /* Alinear el nombre del socio a la izquierda */
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #e1f5fe !important;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #2ecc71;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .negative-message {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .neutral-message {
+            color: #f39c12;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .currency-note {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            /* Hacer que la tabla sea responsiva en pantallas más pequeñas */
+            table, thead, tbody, th, td, tr { 
+                display: block; 
+            }
+            
+            thead tr { 
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr { border: 1px solid #ccc; }
+            
+            td { 
+                border: none;
+                border-bottom: 1px solid #eee; 
+                position: relative;
+                padding-left: 50%; 
+                text-align: right !important;
+            }
+            
+            td:before { 
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%; 
+                padding-right: 10px; 
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+                text-align: left;
+            }
+
+            .total-row td:before {
+                 /* Esto puede ser opcional para la fila total */
+            }
+
+            td:first-child {
+                text-align: right !important; /* Para que el contenido del socio se alinee bien */
+            }
+
+            td:first-child:before {
+                text-align: left;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+            .socio-input {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .socio-input label {
+                flex: none;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Utilidades para Socios</h1>
+        <p class="currency-note">Todas las cantidades se muestran en Quetzales (GTQ)</p>
+        
+        <div class="form-section">
+            <h2>Datos Generales</h2>
+            <div class="form-group">
+                <label for="totalAporte">Aporte Total General:</label>
+                <div class="input-with-icon">
+                    <span class="currency-symbol">Q</span>
+                    <input type="number" id="totalAporte" min="0" step="0.01" placeholder="Ingrese el aporte total">
+                </div>
+                <div class="error" id="errorTotalAporte">Este campo es obligatorio</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="numSocios">Número de Socios:</label>
+                <input type="number" id="numSocios" min="1" placeholder="Ingrese el número de socios">
+                <div class="error" id="errorNumSocios">Este campo es obligatorio</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="ventaFinal">Venta Final:</label>
+                <div class="input-with-icon">
+                    <span class="currency-symbol">Q</span>
+                    <input type="number" id="ventaFinal" min="0" step="0.01" placeholder="Ingrese el monto de venta final">
+                </div>
+                <div class="error" id="errorVentaFinal">Este campo es obligatorio</div>
+            </div>
+            
+            <button id="generarSocios">Generar Campos para Socios</button>
+        </div>
+        
+        <div class="form-section" id="sociosSection" style="display: none;">
+            <h2>Aportes Individuales de Socios</h2>
+            <div id="socioInputs" class="socio-inputs">
+                </div>
+            <div class="error" id="errorAportesSocios">Todos los socios deben tener un aporte</div>
+            <button id="calcularUtilidades">Calcular Utilidades</button>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <h2>Resultados: Distribución de Utilidades</h2>
+            <div id="resultados"></div>
+            <div id="messageContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const totalAporteInput = document.getElementById('totalAporte');
+            const numSociosInput = document.getElementById('numSocios');
+            const ventaFinalInput = document.getElementById('ventaFinal');
+            const generarSociosBtn = document.getElementById('generarSocios');
+            const sociosSection = document.getElementById('sociosSection');
+            const socioInputs = document.getElementById('socioInputs');
+            const calcularUtilidadesBtn = document.getElementById('calcularUtilidades');
+            const resultSection = document.getElementById('resultSection');
+            const resultadosDiv = document.getElementById('resultados');
+            const messageContainer = document.getElementById('messageContainer');
+            
+            // Errores
+            const errorTotalAporte = document.getElementById('errorTotalAporte');
+            const errorNumSocios = document.getElementById('errorNumSocios');
+            const errorVentaFinal = document.getElementById('errorVentaFinal');
+            const errorAportesSocios = document.getElementById('errorAportesSocios');
+
+            // Función para formatear número con comas y dos decimales
+            function formatNumber(number) {
+                return parseFloat(number).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Generar campos para socios
+            generarSociosBtn.addEventListener('click', function() {
+                // Validar campos básicos
+                let isValid = true;
+                
+                if (!totalAporteInput.value || parseFloat(totalAporteInput.value) <= 0) {
+                    errorTotalAporte.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorTotalAporte.style.display = 'none';
+                }
+                
+                if (!numSociosInput.value || parseInt(numSociosInput.value) < 1) {
+                    errorNumSocios.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorNumSocios.style.display = 'none';
+                }
+                
+                if (!ventaFinalInput.value || parseFloat(ventaFinalInput.value) <= 0) {
+                    errorVentaFinal.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorVentaFinal.style.display = 'none';
+                }
+                
+                if (!isValid) return;
+                
+                // Generar campos para cada socio
+                const numSocios = parseInt(numSociosInput.value);
+                socioInputs.innerHTML = '';
+                
+                for (let i = 1; i <= numSocios; i++) {
+                    const socioDiv = document.createElement('div');
+                    socioDiv.className = 'socio-input';
+                    
+                    const label = document.createElement('label');
+                    label.textContent = `Aporte Socio ${i}:`;
+                    
+                    const inputContainer = document.createElement('div');
+                    inputContainer.className = 'input-with-icon';
+                    inputContainer.style.width = '100%';
+                    
+                    const currencySymbol = document.createElement('span');
+                    currencySymbol.className = 'currency-symbol';
+                    currencySymbol.textContent = 'Q';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = '0';
+                    input.step = '0.01';
+                    input.placeholder = 'Ingrese el aporte del socio';
+                    input.id = `socio${i}`;
+                    input.className = 'socio-aporte';
+                    
+                    inputContainer.appendChild(currencySymbol);
+                    inputContainer.appendChild(input);
+                    
+                    socioDiv.appendChild(label);
+                    socioDiv.appendChild(inputContainer);
+                    socioInputs.appendChild(socioDiv);
+                }
+                
+                sociosSection.style.display = 'block';
+                resultSection.style.display = 'none';
+            });
+            
+            // Calcular utilidades
+            calcularUtilidadesBtn.addEventListener('click', function() {
+                // Validar que todos los socios tengan aporte
+                const socioAportes = document.querySelectorAll('.socio-aporte');
+                let totalAportesSocios = 0;
+                let isValid = true;
+                
+                socioAportes.forEach(input => {
+                    if (!input.value || parseFloat(input.value) <= 0) {
+                        isValid = false;
+                    } else {
+                        totalAportesSocios += parseFloat(input.value);
+                    }
+                });
+                
+                if (!isValid) {
+                    errorAportesSocios.style.display = 'block';
+                    return;
+                } else {
+                    errorAportesSocios.style.display = 'none';
+                }
+                
+                // Verificar que la suma de aportes de socios coincida con el aporte total
+                const totalAporte = parseFloat(totalAporteInput.value);
+                
+                if (Math.abs(totalAportesSocios - totalAporte) > 0.01) {
+                    errorAportesSocios.textContent = `La suma de aportes de socios (Q${formatNumber(totalAportesSocios)}) no coincide con el aporte total (Q${formatNumber(totalAporte)})`;
+                    errorAportesSocios.style.display = 'block';
+                    return;
+                } else {
+                    errorAportesSocios.style.display = 'none';
+                }
+                
+                // Calcular utilidad
+                const ventaFinal = parseFloat(ventaFinalInput.value);
+                const utilidad = ventaFinal - totalAporte;
+                let totalARecibirGeneral = 0; // Para el total de la nueva columna
+                
+                // Crear tabla de resultados
+                let tablaHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Socio</th>
+                                <th>Aporte (Q)</th>
+                                <th>Porcentaje de Aporte</th>
+                                <th>Utilidad Correspondiente (Q)</th>
+                                <th>Total a Recibir (Q)</th> </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                socioAportes.forEach((input, index) => {
+                    const aporte = parseFloat(input.value);
+                    const porcentaje = (aporte / totalAporte) * 100;
+                    const utilidadSocio = (porcentaje / 100) * utilidad;
+                    const totalARecibir = aporte + utilidadSocio; // Nuevo cálculo
+                    totalARecibirGeneral += totalARecibir; // Sumar al total general
+
+                    // Usar la función de formateo
+                    const aporteFormatted = formatNumber(aporte);
+                    const porcentajeFormatted = porcentaje.toFixed(2) + '%';
+                    const utilidadSocioFormatted = formatNumber(utilidadSocio);
+                    const totalARecibirFormatted = formatNumber(totalARecibir); // Formatear el total a recibir
+                    
+                    tablaHTML += `
+                        <tr>
+                            <td data-label="Socio">Socio ${index + 1}</td>
+                            <td data-label="Aporte (Q)">${aporteFormatted}</td>
+                            <td data-label="Porcentaje de Aporte">${porcentajeFormatted}</td>
+                            <td data-label="Utilidad Correspondiente (Q)">${utilidadSocioFormatted}</td>
+                            <td data-label="Total a Recibir (Q)">${totalARecibirFormatted}</td> </tr>
+                    `;
+                });
+                
+                // Formatear los totales
+                const totalAporteFormatted = formatNumber(totalAporte);
+                const utilidadFormatted = formatNumber(utilidad);
+                const totalARecibirGeneralFormatted = formatNumber(totalARecibirGeneral);
+
+                tablaHTML += `
+                        <tr class="total-row">
+                            <td data-label="TOTAL">TOTAL</td>
+                            <td data-label="Aporte (Q)">${totalAporteFormatted}</td>
+                            <td data-label="Porcentaje de Aporte">100%</td>
+                            <td data-label="Utilidad Correspondiente (Q)">${utilidadFormatted}</td>
+                            <td data-label="Total a Recibir (Q)">${totalARecibirGeneralFormatted}</td> </tr>
+                    </tbody>
+                </table>
+                `;
+                
+                resultadosDiv.innerHTML = tablaHTML;
+                resultSection.style.display = 'block';
+                
+                // Mostrar mensaje de éxito/pérdida
+                messageContainer.innerHTML = '';
+                let messageDiv = document.createElement('div');
+                
+                if (utilidad > 0) {
+                    messageDiv.className = 'success-message';
+                    messageDiv.textContent = `¡Excelente! La operación generó una utilidad de Q${formatNumber(utilidad)}`;
+                } else if (utilidad < 0) {
+                    messageDiv.className = 'negative-message';
+                    messageDiv.textContent = `Atención: La operación generó una pérdida de Q${formatNumber(Math.abs(utilidad))}`;
+                } else {
+                    messageDiv.className = 'neutral-message';
+                    messageDiv.textContent = 'La operación no generó ni utilidad ni pérdida';
+                }
+                
+                messageContainer.appendChild(messageDiv);
+            });
+        });
+    </script>
+</body>
+</html>
